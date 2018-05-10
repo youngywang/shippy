@@ -50,6 +50,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	log.Printf("listen on: %s\n", PORT)
 
 	server := grpc.NewServer()
 	repo := Repository{}
