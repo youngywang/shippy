@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "shipper/consignment-service/proto/consignment"
+	pb "shippy/consignment-service/proto/consignment"
 	"context"
 	"net"
 	"log"

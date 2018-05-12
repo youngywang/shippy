@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "shipper/consignment-service/proto/consignment"
+	pb "shippy/consignment-service/proto/consignment"
 	"io/ioutil"
 	"encoding/json"
 	"errors"
@@ -16,7 +16,7 @@ const (
 	DEFAULT_INFO_FILE = "consignment.json"
 )
 
-// 读物 consignment.json 中记录的货物信息
+// 读取 consignment.json 中记录的货物信息
 func parseFile(fileName string) (*pb.Consignment, error) {
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
