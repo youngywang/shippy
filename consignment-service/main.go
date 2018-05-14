@@ -3,13 +3,8 @@ package main
 import (
 	pb "shippy/consignment-service/proto/consignment"
 	"context"
-	"net"
 	"log"
-	"google.golang.org/grpc"
-)
-
-const (
-	PORT = ":50051"
+	"github.com/micro/go-micro"
 )
 
 //
@@ -44,39 +39,43 @@ type service struct {
 }
 
 //
-// 实现 consignment.pb.go 中的 ShippingServiceServer 接口
+// 实现 consignment.pb.go 中的 ShippingServiceHandler 接口
 // 使 service 作为 gRPC 的服务端
 //
 // 托运新的货物
-func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
+// func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
+func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, resp *pb.Response) error {
 	// 接收承运的货物
 	consignment, err := s.repo.Create(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	resp := &pb.Response{Created: true, Consignment: consignment}
-	return resp, nil
+	resp.Created = true
+	resp.Consignment = consignment
+	return nil
 }
 
 // 获取目前所有托运的货物
-func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+// func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, resp *pb.Response) error {
 	allConsignments := s.repo.GetAll()
-	resp := &pb.Response{Consignments: allConsignments}
-	return resp, nil
+	resp = &pb.Response{Consignments: allConsignments}
+	return nil
 }
 
 func main() {
-	listener, err := net.Listen("tcp", PORT)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	log.Printf("listen on: %s\n", PORT)
+	server := micro.NewService(
+		// 必须和 consignment.proto 中的 package 一致
+		micro.Name("go.micro.srv.consignment"),
+		micro.Version("latest"),
+	)
 
-	server := grpc.NewServer()
+	// 解析命令行参数
+	server.Init()
 	repo := Repository{}
-	pb.RegisterShippingServiceServer(server, &service{repo})
+	pb.RegisterShippingServiceHandler(server.Server(), &service{repo})
 
-	if err := server.Serve(listener); err != nil {
+	if err := server.Run(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
