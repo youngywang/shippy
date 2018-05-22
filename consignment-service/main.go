@@ -2,14 +2,10 @@ package main
 
 import (
 	pb "shippy/consignment-service/proto/consignment"
+	vesselPb "shippy/vessel-service/proto/vessel"
 	"context"
-	"net"
 	"log"
-	"google.golang.org/grpc"
-)
-
-const (
-	PORT = ":50051"
+	"github.com/micro/go-micro"
 )
 
 //
@@ -41,42 +37,63 @@ func (repo *Repository) GetAll() []*pb.Consignment {
 //
 type service struct {
 	repo Repository
+	// consignment-service 作为客户端调用 vessel-service 的函数
+	vesselClient vesselPb.VesselServiceClient
 }
 
 //
-// 实现 consignment.pb.go 中的 ShippingServiceServer 接口
+// 实现 consignment.pb.go 中的 ShippingServiceHandler 接口
 // 使 service 作为 gRPC 的服务端
 //
 // 托运新的货物
-func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
-	// 接收承运的货物
+// func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
+func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, resp *pb.Response) error {
+
+	// 检查是否有适合的货轮
+	vReq := &vesselPb.Specification{
+		Capacity:  int32(len(req.Containers)),
+		MaxWeight: req.Weight,
+	}
+	vResp, err := s.vesselClient.FindAvailable(context.Background(), vReq)
+	if err != nil {
+		return err
+	}
+
+	// 货物被承运
+	log.Printf("found vessel: %s\n", vResp.Vessel.Name)
+	req.VesselId = vResp.Vessel.Id
 	consignment, err := s.repo.Create(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	resp := &pb.Response{Created: true, Consignment: consignment}
-	return resp, nil
+	resp.Created = true
+	resp.Consignment = consignment
+	return nil
 }
 
 // 获取目前所有托运的货物
-func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+// func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, resp *pb.Response) error {
 	allConsignments := s.repo.GetAll()
-	resp := &pb.Response{Consignments: allConsignments}
-	return resp, nil
+	resp = &pb.Response{Consignments: allConsignments}
+	return nil
 }
 
 func main() {
-	listener, err := net.Listen("tcp", PORT)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	log.Printf("listen on: %s\n", PORT)
+	server := micro.NewService(
+		// 必须和 consignment.proto 中的 package 一致
+		micro.Name("go.micro.srv.consignment"),
+		micro.Version("latest"),
+	)
 
-	server := grpc.NewServer()
+	// 解析命令行参数
+	server.Init()
 	repo := Repository{}
-	pb.RegisterShippingServiceServer(server, &service{repo})
+	// 作为 vessel-service 的客户端
+	vClient := vesselPb.NewVesselServiceClient("go.micro.srv.vessel", server.Client())
+	pb.RegisterShippingServiceHandler(server.Server(), &service{repo, vClient})
 
-	if err := server.Serve(listener); err != nil {
+	if err := server.Run(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
