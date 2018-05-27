@@ -3,7 +3,7 @@
 version: '3.1'
 
 services:
-  consigment-cli:
+  consignment-cli:
     build: ./consignment-cli
     environment:
       MICRO_REGISTRY: "mdns"

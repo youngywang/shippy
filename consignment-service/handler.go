@@ -8,12 +8,14 @@ import (
 	"log"
 )
 
+// 微服务服务端 struct handler 必须实现 protobuf 中定义的 rpc 方法
+// 实现方法的传参等可参考生成的 consignment.pb.go
 type handler struct {
 	session *mgo.Session
 	vesselClient vesselPb.VesselServiceClient
 }
 
-// 为什么不直接用 session
+// 从主会话中 Clone() 出新会话处理查询
 func (h *handler)GetRepo()Repository  {
 	return &ConsignmentRepository{h.session.Clone()}
 }
@@ -52,8 +54,4 @@ func (h *handler)GetConsignments(ctx context.Context, req *pb.GetRequest, resp *
 	}
 	resp.Consignments = consignments
 	return nil
-}
-
-func main() {
-
 }
