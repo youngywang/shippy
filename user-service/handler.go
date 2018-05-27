@@ -7,7 +7,7 @@ import (
 )
 
 type handler struct {
-	repo Repository
+	repo         Repository
 	tokenService Authable
 }
 
