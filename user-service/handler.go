@@ -4,6 +4,7 @@ import (
 	"context"
 	pb "shippy/user-service/proto/user"
 	"golang.org/x/crypto/bcrypt"
+	"errors"
 )
 
 type handler struct {
@@ -66,5 +67,15 @@ func (h *handler) Auth(ctx context.Context, req *pb.User, resp *pb.Token) error 
 }
 
 func (h *handler) ValidateToken(ctx context.Context, req *pb.Token, resp *pb.Token) error {
+	// Decode token
+	claims, err := h.tokenService.Decode(req.Token)
+	if err != nil {
+		return err
+	}
+	if claims.User.Id == "" {
+		return errors.New("invalid user")
+	}
+
+	resp.Valid = true
 	return nil
 }
