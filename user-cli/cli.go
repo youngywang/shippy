@@ -18,7 +18,7 @@ func main() {
 	// 暂时将用户信息写死在代码中
 	name := "Ewan Valentine"
 	email := "ewan.valentine89@gmail.com"
-	password := "Test123"
+	password := "test123"
 	company := "BBC"
 
 	resp, err := client.Create(context.TODO(), &pb.User{
@@ -36,8 +36,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("call GetAll error: %v", err)
 	}
-	for _, u := range allResp.Users {
-		log.Printf("%v\n", u)
+	for i, u := range allResp.Users {
+		log.Printf("user_%d: %v\n", i, u)
 	}
 
 	authResp, err := client.Auth(context.TODO(), &pb.User{

@@ -4,16 +4,11 @@ import (
 	"github.com/labstack/gommon/log"
 	pb "shippy/user-service/proto/user"
 	"github.com/micro/go-micro"
-	"fmt"
 )
 
 func main() {
 	// 连接到数据库
 	db, err := CreateConnection()
-
-	fmt.Printf("%+v\n", db)
-	fmt.Printf("err: %v\n", err)
-
 	defer db.Close()
 
 	if err != nil {
