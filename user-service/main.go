@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/labstack/gommon/log"
+	"log"
 	pb "shippy/user-service/proto/user"
 	"github.com/micro/go-micro"
 )
