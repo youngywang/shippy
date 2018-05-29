@@ -11,6 +11,8 @@ import (
 	"log"
 )
 
+const topic = "user.created"
+
 type handler struct {
 	repo         Repository
 	tokenService Authable
@@ -29,7 +31,7 @@ func (h *handler) Create(ctx context.Context, req *pb.User, resp *pb.Response) e
 	}
 	resp.User = req
 
-	// 发布消息
+	// 发布带有用户所有信息的消息
 	if err := h.publishEvent(req); err != nil {
 		return err
 	}
@@ -51,7 +53,7 @@ func (h *handler) publishEvent(user *pb.User) error {
 	}
 
 	// 发布 user.created topic 消息
-	if err := h.PubSub.Publish("user.created", msg); err != nil {
+	if err := h.PubSub.Publish(topic, msg); err != nil {
 		log.Fatalf("[pub] failed: %v\n", err)
 	}
 	return nil
