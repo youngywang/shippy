@@ -27,8 +27,10 @@ func main() {
 
 	s.Init()
 
+	// 获取 broker 实例
+	pubSub := s.Server().Options().Broker
 	t := TokenService{repo}
-	pb.RegisterUserServiceHandler(s.Server(), &handler{repo, &t})
+	pb.RegisterUserServiceHandler(s.Server(), &handler{repo, &t, pubSub})
 
 	if err := s.Run(); err != nil {
 		log.Fatalf("user service error: %v\n", err)
