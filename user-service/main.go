@@ -20,19 +20,21 @@ func main() {
 	// 自动检查 User 结构是否变化
 	db.AutoMigrate(&pb.User{})
 
-	s := micro.NewService(
+	srv := micro.NewService(
 		micro.Name("go.micro.srv.user"),
 		micro.Version("latest"),
 	)
 
-	s.Init()
+	srv.Init()
 
 	// 获取 broker 实例
-	pubSub := s.Server().Options().Broker
-	t := TokenService{repo}
-	pb.RegisterUserServiceHandler(s.Server(), &handler{repo, &t, pubSub})
+	// pubSub := s.Server().Options().Broker
+	publisher := micro.NewPublisher(topic, srv.Client())
 
-	if err := s.Run(); err != nil {
+	t := TokenService{repo}
+	pb.RegisterUserServiceHandler(srv.Server(), &handler{repo, &t, publisher})
+
+	if err := srv.Run(); err != nil {
 		log.Fatalf("user service error: %v\n", err)
 	}
 
