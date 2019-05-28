@@ -1,0 +1,12 @@
+@startuml
+
+abstract class gateway.conn.ConnInterface
+class gateway.proto.Proxy
+
+
+
+
+
+gateway.conn.ConnInterface o--o gateway.proto.Proxy:管理
+
+@enduml

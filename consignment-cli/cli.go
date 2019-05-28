@@ -1,18 +1,20 @@
 package main
 
 import (
-	pb "shippy/consignment-service/proto/consignment"
-	"io/ioutil"
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-plugins/registry/etcd"
+	"io/ioutil"
 	"log"
 	"os"
-	"context"
-	"github.com/micro/go-micro"
+	pb "shippy/consignment-service/proto/consignment"
+	"time"
 )
 
 const (
-	ADDRESS           = "localhost:50051"
+	ADDRESS           = "10.12.236.238:50051"
 	DEFAULT_INFO_FILE = "consignment.json"
 )
 
@@ -31,11 +33,17 @@ func parseFile(fileName string) (*pb.Consignment, error) {
 }
 
 func main() {
-	sercice := micro.NewService(micro.Name("go.micro.srv.consignment"))
-	sercice.Init()
+	registry := etcd.NewRegistry()
+	service := micro.NewService(
+		micro.Name("go.micro.srv.consignment"),
+		micro.Registry(registry),
+		)
+
+	service.Init()
 
 	// 创建微服务的客户端，简化了手动 Dial 连接服务端的步骤
-	client := pb.NewShippingServiceClient("go.micro.srv.consignment", sercice.Client())
+
+	client := pb.NewShippingService("go.micro.srv.consignment", service.Client())
 
 	// 在命令行中指定新的货物信息 json 件
 	infoFile := DEFAULT_INFO_FILE
@@ -51,7 +59,10 @@ func main() {
 
 	// 调用 RPC
 	// 将货物存储到我们自己的仓库里
-	resp, err := client.CreateConsignment(context.Background(), consignment)
+	ctx,_:=context.WithTimeout(context.Background(), 3 * time.Second)
+
+	resp, err := client.CreateConsignment(ctx, consignment)
+
 	if err != nil {
 		log.Fatalf("create consignment error: %v", err)
 	}

@@ -3,14 +3,10 @@
 
 package go_micro_srv_vessel
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-
 import (
-	client "github.com/micro/go-micro/client"
-	server "github.com/micro/go-micro/server"
-	context "golang.org/x/net/context"
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -22,15 +18,16 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// 每条货轮的熟悉
 type Vessel struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Capacity             int32    `protobuf:"varint,2,opt,name=capacity" json:"capacity,omitempty"`
-	MaxWeight            int32    `protobuf:"varint,3,opt,name=max_weight,json=maxWeight" json:"max_weight,omitempty"`
-	Name                 string   `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
-	Available            bool     `protobuf:"varint,5,opt,name=available" json:"available,omitempty"`
-	OwerId               string   `protobuf:"bytes,6,opt,name=ower_id,json=owerId" json:"ower_id,omitempty"`
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Capacity             int32    `protobuf:"varint,2,opt,name=capacity,proto3" json:"capacity,omitempty"`
+	MaxWeight            int32    `protobuf:"varint,3,opt,name=max_weight,json=maxWeight,proto3" json:"max_weight,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Available            bool     `protobuf:"varint,5,opt,name=available,proto3" json:"available,omitempty"`
+	OwerId               string   `protobuf:"bytes,6,opt,name=ower_id,json=owerId,proto3" json:"ower_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -40,16 +37,17 @@ func (m *Vessel) Reset()         { *m = Vessel{} }
 func (m *Vessel) String() string { return proto.CompactTextString(m) }
 func (*Vessel) ProtoMessage()    {}
 func (*Vessel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_vessel_73360f65e2f33a99, []int{0}
+	return fileDescriptor_04ef66862bb50716, []int{0}
 }
+
 func (m *Vessel) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Vessel.Unmarshal(m, b)
 }
 func (m *Vessel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Vessel.Marshal(b, m, deterministic)
 }
-func (dst *Vessel) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Vessel.Merge(dst, src)
+func (m *Vessel) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Vessel.Merge(m, src)
 }
 func (m *Vessel) XXX_Size() int {
 	return xxx_messageInfo_Vessel.Size(m)
@@ -102,9 +100,10 @@ func (m *Vessel) GetOwerId() string {
 	return ""
 }
 
+// 等待运送的货物
 type Specification struct {
-	Capacity             int32    `protobuf:"varint,1,opt,name=capacity" json:"capacity,omitempty"`
-	MaxWeight            int32    `protobuf:"varint,2,opt,name=max_weight,json=maxWeight" json:"max_weight,omitempty"`
+	Capacity             int32    `protobuf:"varint,1,opt,name=capacity,proto3" json:"capacity,omitempty"`
+	MaxWeight            int32    `protobuf:"varint,2,opt,name=max_weight,json=maxWeight,proto3" json:"max_weight,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -114,16 +113,17 @@ func (m *Specification) Reset()         { *m = Specification{} }
 func (m *Specification) String() string { return proto.CompactTextString(m) }
 func (*Specification) ProtoMessage()    {}
 func (*Specification) Descriptor() ([]byte, []int) {
-	return fileDescriptor_vessel_73360f65e2f33a99, []int{1}
+	return fileDescriptor_04ef66862bb50716, []int{1}
 }
+
 func (m *Specification) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Specification.Unmarshal(m, b)
 }
 func (m *Specification) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Specification.Marshal(b, m, deterministic)
 }
-func (dst *Specification) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Specification.Merge(dst, src)
+func (m *Specification) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Specification.Merge(m, src)
 }
 func (m *Specification) XXX_Size() int {
 	return xxx_messageInfo_Specification.Size(m)
@@ -148,9 +148,11 @@ func (m *Specification) GetMaxWeight() int32 {
 	return 0
 }
 
+// 货轮装得下的话
+// 返回的多条货轮信息
 type Response struct {
-	Vessel               *Vessel   `protobuf:"bytes,1,opt,name=vessel" json:"vessel,omitempty"`
-	Vessels              []*Vessel `protobuf:"bytes,2,rep,name=vessels" json:"vessels,omitempty"`
+	Vessel               *Vessel   `protobuf:"bytes,1,opt,name=vessel,proto3" json:"vessel,omitempty"`
+	Vessels              []*Vessel `protobuf:"bytes,2,rep,name=vessels,proto3" json:"vessels,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -160,16 +162,17 @@ func (m *Response) Reset()         { *m = Response{} }
 func (m *Response) String() string { return proto.CompactTextString(m) }
 func (*Response) ProtoMessage()    {}
 func (*Response) Descriptor() ([]byte, []int) {
-	return fileDescriptor_vessel_73360f65e2f33a99, []int{2}
+	return fileDescriptor_04ef66862bb50716, []int{2}
 }
+
 func (m *Response) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Response.Unmarshal(m, b)
 }
 func (m *Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Response.Marshal(b, m, deterministic)
 }
-func (dst *Response) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Response.Merge(dst, src)
+func (m *Response) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Response.Merge(m, src)
 }
 func (m *Response) XXX_Size() int {
 	return xxx_messageInfo_Response.Size(m)
@@ -200,66 +203,9 @@ func init() {
 	proto.RegisterType((*Response)(nil), "go.micro.srv.vessel.Response")
 }
 
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ client.Option
-var _ server.Option
+func init() { proto.RegisterFile("proto/vessel/vessel.proto", fileDescriptor_04ef66862bb50716) }
 
-// Client API for VesselService service
-
-type VesselServiceClient interface {
-	FindAvailable(ctx context.Context, in *Specification, opts ...client.CallOption) (*Response, error)
-}
-
-type vesselServiceClient struct {
-	c           client.Client
-	serviceName string
-}
-
-func NewVesselServiceClient(serviceName string, c client.Client) VesselServiceClient {
-	if c == nil {
-		c = client.NewClient()
-	}
-	if len(serviceName) == 0 {
-		serviceName = "go.micro.srv.vessel"
-	}
-	return &vesselServiceClient{
-		c:           c,
-		serviceName: serviceName,
-	}
-}
-
-func (c *vesselServiceClient) FindAvailable(ctx context.Context, in *Specification, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.serviceName, "VesselService.FindAvailable", in)
-	out := new(Response)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Server API for VesselService service
-
-type VesselServiceHandler interface {
-	FindAvailable(context.Context, *Specification, *Response) error
-}
-
-func RegisterVesselServiceHandler(s server.Server, hdlr VesselServiceHandler, opts ...server.HandlerOption) {
-	s.Handle(s.NewHandler(&VesselService{hdlr}, opts...))
-}
-
-type VesselService struct {
-	VesselServiceHandler
-}
-
-func (h *VesselService) FindAvailable(ctx context.Context, in *Specification, out *Response) error {
-	return h.VesselServiceHandler.FindAvailable(ctx, in, out)
-}
-
-func init() { proto.RegisterFile("proto/vessel/vessel.proto", fileDescriptor_vessel_73360f65e2f33a99) }
-
-var fileDescriptor_vessel_73360f65e2f33a99 = []byte{
+var fileDescriptor_04ef66862bb50716 = []byte{
 	// 291 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x51, 0xc1, 0x4e, 0xeb, 0x30,
 	0x10, 0x7c, 0x4e, 0xdb, 0xb4, 0xd9, 0xa7, 0x70, 0x30, 0x07, 0x4c, 0xa1, 0x52, 0x94, 0x53, 0x4e,

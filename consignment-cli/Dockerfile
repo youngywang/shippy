@@ -1,4 +1,5 @@
-FROM alpine:latest
+#FROM alpine:latest
+FROM centos:latest
 RUN mkdir -p /app
 WORKDIR /app
 

@@ -1,6 +1,7 @@
 # 若运行环境是 Linux 则需把 alpine 换成 debian
 # 使用最新版 alpine 作为基础镜像
-FROM alpine:latest
+#FROM alpine:latest
+FROM centos:latest
 
 # 在容器的根目录下创建 app 目录
 RUN mkdir /app
@@ -12,4 +13,6 @@ WORKDIR /app
 ADD consignment-service /app/consignment-service
 
 # 运行服务端
-CMD ["./consignment-service"]
+CMD ["/app/consignment-service"]
+
+#ENTRYPOINT ["/app/consignment-service"]

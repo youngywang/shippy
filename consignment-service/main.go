@@ -1,12 +1,14 @@
 package main
 
 import (
+	"github.com/micro/go-plugins/registry/etcd"
+	"context"
+	"github.com/micro/go-micro"
+	"log"
 	pb "shippy/consignment-service/proto/consignment"
 	vesselPb "shippy/vessel-service/proto/vessel"
-	"context"
-	"log"
-	"github.com/micro/go-micro"
 )
+
 
 //
 // 仓库接口
@@ -38,7 +40,7 @@ func (repo *Repository) GetAll() []*pb.Consignment {
 type service struct {
 	repo Repository
 	// consignment-service 作为客户端调用 vessel-service 的函数
-	vesselClient vesselPb.VesselServiceClient
+	vesselClient vesselPb.VesselService
 }
 
 //
@@ -80,17 +82,19 @@ func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, resp 
 }
 
 func main() {
+	registry := etcd.NewRegistry()
 	server := micro.NewService(
 		// 必须和 consignment.proto 中的 package 一致
 		micro.Name("go.micro.srv.consignment"),
 		micro.Version("latest"),
+		micro.Registry(registry),
 	)
 
 	// 解析命令行参数
 	server.Init()
 	repo := Repository{}
 	// 作为 vessel-service 的客户端
-	vClient := vesselPb.NewVesselServiceClient("go.micro.srv.vessel", server.Client())
+	vClient := vesselPb.NewVesselService("go.micro.srv.vessel", server.Client())
 	pb.RegisterShippingServiceHandler(server.Server(), &service{repo, vClient})
 
 	if err := server.Run(); err != nil {

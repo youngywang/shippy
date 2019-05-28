@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/micro/go-plugins/registry/etcd"
 	pb "shippy/vessel-service/proto/vessel"
 	"github.com/pkg/errors"
 	"context"
@@ -49,9 +50,11 @@ func main() {
 		{Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500},
 	}
 	repo := &VesselRepository{vessels}
+	registry := etcd.NewRegistry()
 	server := micro.NewService(
 		micro.Name("go.micro.srv.vessel"),
 		micro.Version("latest"),
+		micro.Registry(registry),
 	)
 	server.Init()
 
